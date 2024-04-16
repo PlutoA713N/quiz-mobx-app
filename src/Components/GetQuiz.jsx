@@ -14,7 +14,7 @@ const GetQuiz = observer(({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/quiz/${6}`);
+        const response = await fetch(`http://localhost:1337/quiz/${id}`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
