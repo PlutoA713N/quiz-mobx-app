@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { observer } from "mobx-react";
+import { observable, action, runInAction } from "mobx";
 import EachQuestion from "./EachQuestion";
 
-const GetQuiz = ({ id }) => {
-  const [quiz, setQuiz] = useState({});
+const quizStore = observable({
+  quiz: {},
+  setQuiz(newQuiz) {
+    this.quiz = newQuiz;
+  }
+});
 
+const GetQuiz = observer(({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/quiz/${id}`);
+        const response = await fetch(`http://localhost:1337/quiz/${6}`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -15,21 +22,22 @@ const GetQuiz = ({ id }) => {
         
         const data = await response.json();
         
-        setQuiz(data);
+        runInAction(() => {
+          quizStore.setQuiz(data);
+        });
       } catch (error) {
         console.error("Fetch error:", error);
       }
     };
   
     fetchData();
-  }, []);
+  }, [id]);
 
-
-    return (
-      <>  
-      {Object.keys(quiz).length > 0 && <EachQuestion quizData={quiz} />} 
-      </>
-    ); 
-};
+  return (
+    <>  
+    {Object.keys(quizStore.quiz).length > 0 && <EachQuestion quizData={quizStore.quiz} />} 
+    </>
+  ); 
+});
 
 export default GetQuiz;
