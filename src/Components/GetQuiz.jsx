@@ -27,7 +27,7 @@ const GetQuiz = ({ id }) => {
 
     return (
       <>  
-        <EachQuestion quizData={quiz} /> 
+      {Object.keys(quiz).length > 0 && <EachQuestion quizData={quiz} />} 
       </>
     ); 
 };
