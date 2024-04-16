@@ -1,8 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { useLocalObservable } from "mobx-react";
 
-const EachQuestion = ({ quizData }) => {
-  const [questionData, setQuestionData] = useState({});
-  
+const EachQuestion = observer(({ quizData }) => {
+  const store = useLocalObservable(() => ({
+    questionData: {},
+    setQuestionData(data) {
+      this.questionData = data;
+    },
+    handleCheckboxChange(questionIndex, answerIndex) {
+      const updatedQuestions = [...this.questionData.questions];
+      updatedQuestions[questionIndex].answers[answerIndex].isChecked = !updatedQuestions[questionIndex].answers[answerIndex].isChecked;
+      this.questionData = {
+        ...this.questionData,
+        questions: updatedQuestions
+      };
+    },
+    async handleSubmit() {
+      try {
+        const postData = {
+          quizId: this.questionData.id,
+          questions: this.questionData.questions.map(question => ({
+            id: question.id,
+            questionText: question.questionText,
+            answers: question.answers
+          })),
+          title: this.questionData.title,
+          userId: this.questionData.userId
+        };
+    
+        const response = await fetch("http://localhost:1337/quiz/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(postData)
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        const responseData = await response.json();
+        console.log("Post request response:", responseData);
+      } catch (error) {
+        console.error("Error while sending POST request:", error);
+      }
+    }
+  }));
+
   useEffect(() => {
     const initializedData = {
       ...quizData,
@@ -14,71 +60,18 @@ const EachQuestion = ({ quizData }) => {
         }))
       }))
     };
-    setQuestionData(initializedData);
-  }, [quizData]);
-
-  const handleCheckboxChange = (questionIndex, answerIndex) => {
-    setQuestionData(prevQuestionData => {
-      const updatedQuestions = [...prevQuestionData.questions];
-      updatedQuestions[questionIndex] = {
-        ...updatedQuestions[questionIndex],
-        answers: updatedQuestions[questionIndex].answers.map((answer, index) => {
-          if (index === answerIndex) {
-            return {
-              ...answer,
-              isChecked: !answer.isChecked
-            };
-          }
-          return answer;
-        })
-      };
-      return { ...prevQuestionData, questions: updatedQuestions };
-    });
-  };
-  
-
-  const handleSubmit = async () => {
-    try {
-      const postData = {
-        quizId: questionData.id,
-        questions: questionData.questions.map(question => ({
-          id: question.id,
-          questionText: question.questionText,
-          answers: question.answers
-        })),
-        title: questionData.title,
-        userId: questionData.userId
-      };
-  
-      const response = await fetch("http://localhost:1337/quiz/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(postData)
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const responseData = await response.json();
-      console.log("Post request response:", responseData);
-    } catch (error) {
-      console.error("Error while sending POST request:", error);
-    }
-  };
-  
+    store.setQuestionData(initializedData);
+  }, [quizData, store]);
 
   return (
     <>
-      {Object.keys(questionData).length === 0 ? (
+      {Object.keys(store.questionData).length === 0 ? (
         <p>Loading....</p>
       ) : (
         <>
-          <h2>{questionData.title}</h2>
+          <h2>{store.questionData.title}</h2>
           <ul>
-            {questionData.questions.map((question, questionIndex) => (
+            {store.questionData.questions.map((question, questionIndex) => (
               <li key={question.id}>
                 <h3>{question.questionText}</h3>
                 <ul>
@@ -87,7 +80,7 @@ const EachQuestion = ({ quizData }) => {
                       <input
                         type="checkbox"
                         checked={answer.isChecked} 
-                        onChange={() => handleCheckboxChange(questionIndex, answerIndex)}
+                        onChange={() => store.handleCheckboxChange(questionIndex, answerIndex)}
                       />{" "}
                       {answer.optionName}
                     </li>
@@ -96,11 +89,11 @@ const EachQuestion = ({ quizData }) => {
               </li>
             ))}
           </ul>
-          <button onClick={handleSubmit}>Submit</button> 
+          <button onClick={store.handleSubmit}>Submit</button> 
         </>
       )}
     </>
   );
-};
+});
 
 export default EachQuestion;
