@@ -1,122 +1,163 @@
-import { useState } from "react";
+import React from "react";
+import { autorun, observable, action, runInAction } from "mobx";
+import { observer } from "mobx-react-lite";
+import { makeObservable } from "mobx";
 
-const CreateQuiz = () => {
-  const [quizTitle, setQuizTitle] = useState("");
-  const [questionText, setQuestionText] = useState("");
-  const [answerOptions, setAnswerOptions] = useState([]);
-  const [questions, setQuestions] = useState([]);
+class QuizStore {
+  quizTitle = "";
+  questionText = "";
+  answerOptions = [];
+  questions = [];
+  userId = 0;
 
-  let userId = 0
+  constructor() {
+    makeObservable(this, {
+      quizTitle: observable,
+      questionText: observable,
+      answerOptions: observable,
+      questions: observable,
+      userId: observable,
+      handleQuizTitleChange: action,
+      handleAddQuestion: action,
+      handleAddAnswerOption: action,
+      handleAnswerOptionChange: action,
+      handleCheckboxChange: action,
+      handleSubmitQuiz: action,
+    });
+  }
 
-  const handleAddQuestion = (e) => {
+  handleQuizTitleChange = (e) => {
+    const titleValue = e.target.value;
+    runInAction(() => {
+      this.quizTitle = titleValue;
+    });
+  };
+
+  handleAddQuestion = (e) => {
     e.preventDefault();
 
-    if (!questionText.trim()) {
-        console.error("Question text cannot be empty");
-        return;
-      }
+    if (!this.questionText.trim()) {
+      console.error("Question text cannot be empty");
+      return;
+    }
 
-      if (answerOptions.some(option => !option.optionName.trim())) {
-        console.error("Answer option cannot be empty");
-        return;
-      }
-      
+    if (this.answerOptions.some((option) => !option.optionName.trim())) {
+      console.error("Answer option cannot be empty");
+      return;
+    }
+
     const newQuestion = {
-      questionText: questionText,
-      answers: answerOptions.map((answer) => ({
+      questionText: this.questionText,
+      answers: this.answerOptions.map((answer) => ({
         optionName: answer.optionName,
         isChecked: answer.isChecked,
       })),
     };
-    setQuestions([...questions, newQuestion]);
-    setQuestionText("");
-    setAnswerOptions([]);
+
+    runInAction(() => {
+      this.questions.push(newQuestion);
+      this.questionText = "";
+      this.answerOptions = [];
+    });
   };
 
-  const handleAddAnswerOption = () => {
-    setAnswerOptions([...answerOptions, { optionName: "", isChecked: false }]);
+  handleAddAnswerOption = () => {
+    runInAction(() => {
+      this.answerOptions.push({ optionName: "", isChecked: false });
+    });
   };
 
-  const handleAnswerOptionChange = (index, key, value) => {
-    const updatedAnswerOptions = [...answerOptions];
-    updatedAnswerOptions[index][key] = value;
-    setAnswerOptions(updatedAnswerOptions);
+  handleAnswerOptionChange = (index, key, value) => {
+    runInAction(() => {
+      this.answerOptions[index][key] = value;
+    });
   };
 
-  const handleCheckboxChange = (index) => {
-    const updatedAnswerOptions = [...answerOptions];
-    updatedAnswerOptions[index].isChecked = !updatedAnswerOptions[index].isChecked;
-    setAnswerOptions(updatedAnswerOptions);
+  handleCheckboxChange = (index) => {
+    runInAction(() => {
+      this.answerOptions[index].isChecked = !this.answerOptions[index].isChecked;
+    });
   };
 
-  const handleSubmitQuiz = async () => {
+  handleSubmitQuiz = async () => {
     try {
+      const userId = Math.floor(10000 + Math.random() * 90000);
+      
       const quizData = {
-        title: quizTitle,
-        userId: userId += 0.1,
-        questions: questions,
+        title: this.quizTitle,
+        userId: userId,
+        questions: this.questions,
       };
-      const response = await fetch('http://localhost:1337/create-quiz', {
-        method: 'POST',
+      const response = await fetch("http://localhost:1337/create-quiz", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(quizData),
       });
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
-      console.log('Quiz posted successfully');
-      setQuizTitle("");
-      setQuestionText("");
-      setAnswerOptions([]);
-      setQuestions([]);
-    } catch(error) {
+      console.log("Quiz posted successfully");
+
+      runInAction(() => {
+        this.quizTitle = "";
+        this.questionText = "";
+        this.answerOptions = [];
+        this.questions = [];
+      });
+    } catch (error) {
       console.error("Quiz post error:", error);
     }
   };
+}
 
+const quizStore = new QuizStore();
+
+const CreateQuiz = observer(() => {
   return (
     <>
       <input
         type="text"
         placeholder="Enter Quiz title"
-        value={quizTitle}
-        onChange={(e) => setQuizTitle(e.target.value)}
+        value={quizStore.quizTitle}
+        onChange={quizStore.handleQuizTitleChange}
       />
 
-      <form onSubmit={handleAddQuestion}>
+      <form onSubmit={quizStore.handleAddQuestion}>
         <input
           type="text"
           placeholder="Enter Question"
-          value={questionText}
-          onChange={(e) => setQuestionText(e.target.value)}
+          value={quizStore.questionText}
+          onChange={(e) => (quizStore.questionText = e.target.value)}
         />
-        {answerOptions.map((option, index) => (
+        {quizStore.answerOptions.map((option, index) => (
           <div key={index}>
             <input
               type="text"
               placeholder={`Enter Answer Option ${index + 1}`}
               value={option.optionName}
-              onChange={(e) => handleAnswerOptionChange(index, 'optionName', e.target.value)}
+              onChange={(e) => quizStore.handleAnswerOptionChange(index, "optionName", e.target.value)}
             />
             <input
               type="checkbox"
               checked={option.isChecked}
-              onChange={() => handleCheckboxChange(index)}
+              onChange={() => quizStore.handleCheckboxChange(index)}
             />
           </div>
         ))}
-        <button type="button" onClick={handleAddAnswerOption}>
+        <button type="button" onClick={quizStore.handleAddAnswerOption}>
           Add Answer Option
         </button>
         <button type="submit">Add Question</button>
       </form>
-      <button type="button" onClick={handleSubmitQuiz}>Submit Quiz</button>
+      <button type="button" onClick={quizStore.handleSubmitQuiz}>
+        Submit Quiz
+      </button>
 
       <h2>Added Questions:</h2>
       <ul>
-        {questions.map((question, index) => (
+        {quizStore.questions.map((question, index) => (
           <li key={index}>
             <h3>{question.questionText}</h3>
             <ul>
@@ -131,6 +172,6 @@ const CreateQuiz = () => {
       </ul>
     </>
   );
-};
+});
 
 export default CreateQuiz;
