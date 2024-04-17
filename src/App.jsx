@@ -7,8 +7,8 @@ function App() {
   return (
     <>
      <GetQuiz id={6} />
-     {/* <GetResults /> */}
     <CreateQuiz />
+    <GetResults />
     </>
   )
 }
