@@ -4,6 +4,7 @@ import { useLocalObservable } from "mobx-react";
 
 const EachQuestion = observer(({ quizData }) => {
   const store = useLocalObservable(() => ({
+    responseData: null,
     questionData: {},
     setQuestionData(data) {
       this.questionData = data;
@@ -43,6 +44,7 @@ const EachQuestion = observer(({ quizData }) => {
     
         const responseData = await response.json();
         console.log("Post request response:", responseData);
+        this.responseData = responseData;
       } catch (error) {
         console.error("Error while sending POST request:", error);
       }
@@ -81,7 +83,7 @@ const EachQuestion = observer(({ quizData }) => {
                         type="checkbox"
                         checked={answer.isChecked} 
                         onChange={() => store.handleCheckboxChange(questionIndex, answerIndex)}
-                      />{" "}
+                      />
                       {answer.optionName}
                     </li>
                   ))}
@@ -90,6 +92,16 @@ const EachQuestion = observer(({ quizData }) => {
             ))}
           </ul>
           <button onClick={store.handleSubmit}>Submit</button> 
+
+          {store.responseData && (
+            <div style={{border: '2px solid yellow'}}>
+              <h3>Response Data:</h3>
+              <p>quizId: {store.responseData.quizId}</p>
+              <p>userId: {store.responseData.userId}</p>
+              <p>score: {store.responseData.score}</p>
+            </div>
+
+          )}
         </>
       )}
     </>
