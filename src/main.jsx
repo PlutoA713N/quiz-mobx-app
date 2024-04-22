@@ -1,10 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Auth0Provider } from '@auth0/auth0-react';
+import App from './App';
+// import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  // <React.StrictMode>
+const root = createRoot(document.getElementById('root'));
+
+root.render(
+  <Auth0Provider
+    domain="dev-3e5w3b8uhxdlo41m.us.auth0.com"
+    clientId="kgi53MIzOzLuyCAgd99t1Bel5rQehLeW"
+    authorizationParams={{
+      redirect_uri: window.location.origin,
+      audience: "https://dev-3e5w3b8uhxdlo41m.us.auth0.com/api/v2/",
+      scope: "read:current_user update:current_user_metadata"
+    }}
+  >
     <App />
-  // {/* </React.StrictMode>, */}
-)
+  </Auth0Provider>
+);
