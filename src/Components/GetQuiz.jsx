@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { observable, action, runInAction } from "mobx";
 import EachQuestion from "./EachQuestion";
+import { useParams } from "react-router-dom";
 
 const quizStore = observable({
   quiz: {},
@@ -10,7 +11,8 @@ const quizStore = observable({
   }
 });
 
-const GetQuiz = observer(({ id }) => {
+const GetQuiz = observer(() => {
+  const { id } = useParams()
   useEffect(() => {
     const fetchData = async () => {
       try {
