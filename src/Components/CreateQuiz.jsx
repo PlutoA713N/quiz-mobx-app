@@ -9,6 +9,7 @@ class QuizStore {
   answerOptions = [];
   questions = [];
   userId = 0;
+  quizResponse = null;
 
   constructor() {
     makeObservable(this, {
@@ -17,6 +18,7 @@ class QuizStore {
       answerOptions: observable,
       questions: observable,
       userId: observable,
+      quizResponse: observable,
       handleQuizTitleChange: action,
       handleAddQuestion: action,
       handleAddAnswerOption: action,
@@ -79,10 +81,10 @@ class QuizStore {
     });
   };
 
-  handleSubmitQuiz = async () => {
+  handleSubmitQuiz = async (userID) => {
     try {
-      const userId = Math.floor(10000 + Math.random() * 90000);
-      
+      const userId = userID
+
       const quizData = {
         title: this.quizTitle,
         userId: userId,
@@ -100,11 +102,17 @@ class QuizStore {
       }
       console.log("Quiz posted successfully");
 
+      const responseData = await response.json()
+
+      // console.log( `The Quiz ${title} is created successfully by the user of ${user} & the quiz Id is ${id}`)
+
+
       runInAction(() => {
         this.quizTitle = "";
         this.questionText = "";
         this.answerOptions = [];
         this.questions = [];
+        this.quizResponse = responseData;
       });
     } catch (error) {
       console.error("Quiz post error:", error);
@@ -114,7 +122,7 @@ class QuizStore {
 
 const quizStore = new QuizStore();
 
-const CreateQuiz = observer(() => {
+const CreateQuiz = observer(({ userId }) => {
   return (
     <>
       <input
@@ -151,9 +159,17 @@ const CreateQuiz = observer(() => {
         </button>
         <button type="submit">Add Question</button>
       </form>
-      <button type="button" onClick={quizStore.handleSubmitQuiz}>
+      {/* <button type="button" onClick={quizStore.handleSubmitQuiz(userId)}> */}
+      <button type="button" onClick={() => quizStore.handleSubmitQuiz(userId)}>
         Submit Quiz
       </button>
+
+      {quizStore.quizResponse && 
+        <>
+          {`${quizStore.quizResponse.quiz.title} is created successfully by the userId ${quizStore.quizResponse.quiz.userId}, the quiz id is ${quizStore.quizResponse.quiz.id}`}
+        </>
+      }
+
 
       <h2>Added Questions:</h2>
       <ul>
