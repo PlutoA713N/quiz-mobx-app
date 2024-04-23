@@ -16,7 +16,7 @@ const GetQuiz = observer(() => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:1337/quiz/${id}`);
+        const response = await fetch(`https://quizbackend-gtn6.onrender.com/quiz/${id}`);
         
         if (!response.ok) {
           throw new Error('Network response was not ok');

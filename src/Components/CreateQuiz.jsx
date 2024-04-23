@@ -90,7 +90,7 @@ class QuizStore {
         userId: userId,
         questions: this.questions,
       };
-      const response = await fetch("http://localhost:1337/create-quiz", {
+      const response = await fetch("https://quizbackend-gtn6.onrender.com/create-quiz", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
