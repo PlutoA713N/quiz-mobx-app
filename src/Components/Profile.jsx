@@ -10,7 +10,7 @@ const Profile = () => {
         <>
             {isAuthenticated && (
                 <>
-                    <p style={{border: '2px solid red', padding: '5px'}}>User Id is {user.sub}</p>
+                    <p style={{border: '2px solid red', padding: '5px'}}> User Id is {user.sub}</p>
                     <CreateQuiz userId={user.sub}/>
                 </>
             )}
