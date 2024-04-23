@@ -2,6 +2,7 @@ import React from "react";
 import { autorun, observable, action, runInAction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { makeObservable } from "mobx";
+import { Link } from "react-router-dom";
 
 class QuizStore {
   quizTitle = "";
@@ -166,8 +167,11 @@ const CreateQuiz = observer(({ userId }) => {
 
       {quizStore.quizResponse && 
         <>
-          {`${quizStore.quizResponse.quiz.title} is created successfully by the userId ${quizStore.quizResponse.quiz.userId}, the quiz id is ${quizStore.quizResponse.quiz.id}`}
-        </>
+          {`${quizStore.quizResponse.quiz.title} is created successfully by the userId ${quizStore.quizResponse.quiz.userId}, the quiz id is `}
+          <Link to={`/quiz/${quizStore.quizResponse.quiz.id}`}>
+             {quizStore.quizResponse.quiz.id}
+          </Link>       
+       </>
       }
 
 
