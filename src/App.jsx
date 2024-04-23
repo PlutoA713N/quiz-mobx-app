@@ -36,10 +36,9 @@ const App = () => {
 
       <Routes>
  
-        <Route path="/get-quiz/:id" element={<GetQuiz />} />
+        <Route path="/quiz/:id" element={<GetQuiz />} />
       
       </Routes>
-
     </Router>
   );
 }
