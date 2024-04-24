@@ -1,8 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import App from './App';
-// import './index.css';
+import GetQuiz from './GetQuiz'; 
 
 const root = createRoot(document.getElementById('root'));
 
@@ -16,6 +17,11 @@ root.render(
       scope: "read:current_user update:current_user_metadata"
     }}
   >
-    <App />
+    <Router>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/quiz/:id" element={<GetQuiz />} />
+      </Routes>
+    </Router>
   </Auth0Provider>
 );
