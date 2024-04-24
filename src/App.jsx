@@ -6,6 +6,7 @@ import LogoutButton from "./Components/LogoutButton";
 import Profile from "./Components/Profile";
 import GetResults from "./Components/GetResults";
 import AppRoutes from "./Components/AppRoutes";
+import GetQuiz from "./Components/GetQuiz";
 
 const App = () => {
   const [showResults, setShowResults] = useState(false);
@@ -31,7 +32,7 @@ const App = () => {
         {showResults && isAuthenticated && <GetResults />}
       </div>
       <>
-             <AppRoutes /> 
+             <GetQuiz id={3} /> 
       </>
       </>
   );

@@ -11,8 +11,8 @@ const quizStore = observable({
   }
 });
 
-const GetQuiz = observer(() => {
-  const { id } = useParams()
+const GetQuiz = observer(( {id} ) => {
+  // const { id } = useParams()
   useEffect(() => {
     const fetchData = async () => {
       try {
