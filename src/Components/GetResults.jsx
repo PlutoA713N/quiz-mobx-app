@@ -18,6 +18,7 @@ const GetResults = observer(() => {
     
       runInAction(() => {
         results.replace(data);
+        console.log('resultsData', data)
       });
 
     } catch (error) {
@@ -35,6 +36,7 @@ const GetResults = observer(() => {
 
   return (
     <>
+    {JSON.stringify(results)}
       {results.map((result, index) => (
         <div style={{ border: "2px solid black" }} key={index}>
           <p>userId: {result.userId}</p>
