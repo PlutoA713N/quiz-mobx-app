@@ -18,8 +18,10 @@ const GetResults = observer(() => {
     
       runInAction(() => {
         results.replace(data);
-        console.log('resultsData', data)
       });
+
+      console.log('resultsData', data)
+
 
     } catch (error) {
       console.error("Fetch error:", error);
