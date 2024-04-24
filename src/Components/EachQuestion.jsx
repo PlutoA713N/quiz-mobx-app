@@ -30,7 +30,7 @@ const EachQuestion = observer(({ quizData }) => {
           userId: this.questionData.userId
         };
     
-        const response = await fetch("http://localhost:1337/quiz/submit", {
+        const response = await fetch("https://quizbackend-gtn6.onrender.com/quiz/submit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
