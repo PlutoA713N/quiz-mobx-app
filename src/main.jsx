@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import App from './App';
-import GetQuiz from './GetQuiz'; 
+import GetQuiz from './Components/GetQuiz';
 
 const root = createRoot(document.getElementById('root'));
 
