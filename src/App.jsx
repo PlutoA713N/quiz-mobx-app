@@ -32,7 +32,7 @@ const App = () => {
         {showResults && isAuthenticated && <GetResults />}
       </div>
       <>
-             <GetQuiz id={4} /> 
+             {/* <GetQuiz id={4} />  */}
       </>
       </>
   );
